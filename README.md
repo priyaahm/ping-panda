@@ -11,7 +11,7 @@ Built with the Next.js App Router, Postgres, TypeScript, Tailwind & Clerk
 - 🎨 Custom artworks made by a professional illustrator
 - ✉️ Real-time event messages via Discord
 - 🖥️ Clean & intuitive event monitoring dashboard
-- 💳 Secure payments using Stripe
+- 💳 Secure payments using Razorpay
 - 🛍️ Customers can purchase your PRO plan
 - 🌟 Clean, modern UI on top of shadcn-ui
 - 🔑 Authentication using Clerk
@@ -27,7 +27,6 @@ To get started with this project, run
 ```
 
 and copy the .env.example variables into a separate .env file, fill them out & and that's all you need to get started!
-
 
 ## Acknowledgements
 

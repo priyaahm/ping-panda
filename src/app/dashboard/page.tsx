@@ -6,7 +6,7 @@ import { DashboardPageContent } from "./dashboard-page-content"
 import { CreateEventCategoryModal } from "@/components/create-event-category-modal"
 import { Button } from "@/components/ui/button"
 import { PlusIcon } from "lucide-react"
-import { createCheckoutSession } from "@/lib/stripe"
+import { createCheckoutSession } from "@/lib/razorpay"
 import { PaymentSuccessModal } from "@/components/payment-success-modal"
 
 interface PageProps {
@@ -33,9 +33,13 @@ const Page = async ({ searchParams }: PageProps) => {
   const intent = searchParams.intent
 
   if (intent === "upgrade") {
+    // Amount in cents (4900 cents = $49 USD)
+    const amountInCents = 4900
+
     const session = await createCheckoutSession({
       userEmail: user.email,
       userId: user.id,
+      amount: amountInCents,
     })
 
     if (session.url) redirect(session.url)
