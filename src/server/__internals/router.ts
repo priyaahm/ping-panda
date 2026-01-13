@@ -39,7 +39,7 @@ export const router = <T extends Record<string, OperationType<any, any>>>(
   )
 
   Object.entries(obj).forEach(([key, operation]) => {
-    const path = `/${key}` as const
+    const path: string = `/${key}`
 
     const operationMiddlewares: MiddlewareHandler[] = operation.middlewares.map(
       (middleware) => {
@@ -67,7 +67,7 @@ export const router = <T extends Record<string, OperationType<any, any>>>(
           path,
           queryParsingMiddleware,
           ...operationMiddlewares,
-          (c) => {
+          async (c): Promise<Response> => {
             const ctx = c.get("__middleware_output") || {}
             const parsedQuery = c.get("parsedQuery")
 
@@ -85,15 +85,32 @@ export const router = <T extends Record<string, OperationType<any, any>>>(
               }
             }
 
-            return operation.handler({ c, ctx, input })
+            const result = await operation.handler({ c, ctx, input })
+            // TypedResponse extends Response, but we need to ensure it's properly handled
+            if (result instanceof Response) {
+              return result
+            }
+            // If it's not a Response, convert it using c.json
+            return c.json(result as any)
           }
         )
+        
       } else {
-        route.get(path, ...operationMiddlewares, (c) => {
-          const ctx = c.get("__middleware_output") || {}
+        const handlers = [
+          ...operationMiddlewares,
+          async (c: Context): Promise<Response> => {
+            const ctx = c.get("__middleware_output") || {}
 
-          return operation.handler({ c, ctx, input: undefined })
-        })
+            const result = await operation.handler({ c, ctx, input: undefined })
+            // TypedResponse extends Response, but we need to ensure it's properly handled
+            if (result instanceof Response) {
+              return result
+            }
+            // If it's not a Response, convert it using c.json
+            return c.json(result as any)
+          },
+        ] as any[]
+        ;(route.get as any)(path, ...handlers)
       }
     } else if (operation.type === "mutation") {
       if (operation.schema) {
@@ -101,7 +118,7 @@ export const router = <T extends Record<string, OperationType<any, any>>>(
           path,
           bodyParsingMiddleware,
           ...operationMiddlewares,
-          (c) => {
+          async (c): Promise<Response> => {
             const ctx = c.get("__middleware_output") || {}
             const parsedBody = c.get("parsedBody")
 
@@ -119,15 +136,31 @@ export const router = <T extends Record<string, OperationType<any, any>>>(
               }
             }
 
-            return operation.handler({ c, ctx, input })
+            const result = await operation.handler({ c, ctx, input })
+            // TypedResponse extends Response, but we need to ensure it's properly handled
+            if (result instanceof Response) {
+              return result
+            }
+            // If it's not a Response, convert it using c.json
+            return c.json(result as any)
           }
         )
       } else {
-        route.post(path, ...operationMiddlewares, (c) => {
-          const ctx = c.get("__middleware_output") || {}
+        const handlers = [
+          ...operationMiddlewares,
+          async (c: Context): Promise<Response> => {
+            const ctx = c.get("__middleware_output") || {}
 
-          return operation.handler({ c, ctx, input: undefined })
-        })
+            const result = await operation.handler({ c, ctx, input: undefined })
+            // TypedResponse extends Response, but we need to ensure it's properly handled
+            if (result instanceof Response) {
+              return result
+            }
+            // If it's not a Response, convert it using c.json
+            return c.json(result as any)
+          },
+        ] as any[]
+        ;(route.post as any)(path, ...handlers)
       }
     }
   })
