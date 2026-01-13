@@ -22,8 +22,13 @@ export const baseClient = hc<AppType>(getBaseUrl(), {
     const response = await fetch(input, { ...init, cache: "no-store" })
 
     if (!response.ok) {
+      // Narrow status to contentful HTTP status codes (400–599)
+      const status =
+        response.status >= 400 && response.status <= 599
+          ? (response.status as 400 | 401 | 403 | 404 | 500)
+          : 500
 
-      throw new HTTPException(response.status, {
+      throw new HTTPException(status, {
         message: response.statusText,
         res: response,
       })
@@ -49,6 +54,7 @@ export const baseClient = hc<AppType>(getBaseUrl(), {
     return response
   },
 })["api"]
+
 
 function getHandler(obj: Object, ...keys: string[]) {
   let current = obj
