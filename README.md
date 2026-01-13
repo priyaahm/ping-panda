@@ -2,6 +2,7 @@
 
 Built with the Next.js App Router, Postgres, TypeScript, Tailwind & Clerk
 
+Link: https://ping-panda-mocha.vercel.app
 <!-- ![Project Image](https://github.com/joschan21/pingpanda/blob/main/public/thumbnail.png) -->
 
 ## Features
